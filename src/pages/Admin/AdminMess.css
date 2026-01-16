@@ -1,0 +1,24 @@
+.card{
+        background-color: red;
+    height: 38vh;
+    width: 10vw;
+}
+.card-body{
+    background-color: blue;
+    height: 20vh;
+    width: 8vw;
+}
+.card-body input{
+    width: 7vw;
+}
+.card-body1{
+    display: flex;
+    justify-content: center;
+    /* align-items: center; */
+    text-align: center;
+}
+.modify{
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}

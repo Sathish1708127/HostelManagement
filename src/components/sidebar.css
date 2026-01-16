@@ -1,0 +1,34 @@
+.admin{
+    background-color: rgb(40,41,42);
+    height: 100vh;
+    width: 15vw;
+    position: absolute;
+}
+.student{
+    background-color: rgb(40,41,42);
+    height: 100vh;
+    width: 15vw;
+    position: absolute;
+}
+.sidebar h1{
+    color: white;
+}
+.sidebar ul{
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+.sidebar li{background-color: black;
+    width: 10vw;
+    height: 5vh;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+
+.sidebar li a{
+    text-decoration: none;
+    color: white;
+    font-size: 16px;
+}

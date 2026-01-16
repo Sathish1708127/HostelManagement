@@ -1,0 +1,1 @@
+in this both admin (menu) and student (review) can access the mess management system.

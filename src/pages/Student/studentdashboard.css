@@ -1,0 +1,63 @@
+.dash{
+    background-color: greenyellow;
+    width: 60vw;
+    margin-left: 194px;
+    border: 2px solid black;
+    padding: 10px;
+}
+.form {
+    display: grid;
+    width: 61vw;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+}
+
+
+.form form {
+    display: flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items: center;
+    width: 40vw;
+    gap: 20px;
+}
+.form fieldset{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    width: 500px;
+    gap: 5px;
+}
+.form label{
+    font-size: 24px;
+}
+.form input{
+    height: 4vh;
+}
+.savebtn{
+    width: 7vw;
+    height: 7vh;
+    border-radius: 8px;
+    background-color: blue;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}
+.resetbtn{
+    width: 7vw;
+    height: 7vh;
+    border-radius: 8px;
+    background-color: red;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    cursor: pointer;
+}
+.save{
+    column-gap: 33px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56vw;
+}
