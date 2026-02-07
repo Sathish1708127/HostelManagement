@@ -1,7 +1,7 @@
 import React from 'react'
-import './Announcements.css'
+import '../../styles/admincss/Announcements.css'
 
-export function AnnouncementsAdmin(){
+export default function AnnouncementsAdmin(){
     return(
         <div className='ann1'>
             <div className="ann">

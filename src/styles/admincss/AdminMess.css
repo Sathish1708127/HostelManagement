@@ -21,4 +21,12 @@
     display: flex;
     flex-direction: row;
     gap: 20px;
+    width: 76vw;
+    left: 301px;
+    position: sticky;
+}
+.container{
+    width: 76vw;
+    left: 301px;
+    position: sticky;
 }

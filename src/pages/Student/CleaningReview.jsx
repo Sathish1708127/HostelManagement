@@ -1,116 +1,85 @@
 import React, { useState } from 'react'
-import './mess.css'
-import './complaints.css'
-
-const MIN_RATING = 1
-const MAX_RATING = 10
+import '../../styles/studentcss/cleaning.css'
+import '../../styles/width.css'
 
 export default function CleaningReview() {
-    const [formData, setFormData] = useState({
-        name: '',
-        roomNo: '',
-        sweeping: false,
-        mopping: false,
-        rating: 5
+  const [formData, setFormData] = useState({
+    name: '',
+    roomNo: '',
+    cleanliness: '',
+    improvements: ''
+  })
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     })
+  }
 
-    const handleInputChange = (e) => {
-        const { name, value, type, checked } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }))
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    const newReview = {
+      ...formData,
+      status: 'Not Cleaned',
+      date: new Date().toLocaleDateString()
     }
 
-    const updateRating = (increment) => {
-        setFormData(prev => ({
-            ...prev,
-            rating: Math.max(MIN_RATING, Math.min(MAX_RATING, prev.rating + increment))
-        }))
-    }
+    console.log('Cleaning Review Submitted:', newReview)
+    // TODO: send to backend / Firebase
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        if (!formData.name.trim() || !formData.roomNo.trim()) {
-            alert('Please fill in all required fields')
-            return
-        }
-        console.log('Review submitted:', formData)
-        // Add your API call or data handling here
-    }
+    setFormData({
+      name: '',
+      roomNo: '',
+      cleanliness: '',
+      improvements: ''
+    })
+  }
 
-    return (
-        <div className='complain'>
-          <div className='header'>
-            <h1>Cleaning Review</h1>
-          </div>
-            <div className='complainbox'>
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="name">NAME:</label>
-                    <input 
-                        type="text" 
-                        id="name" 
-                        name="name"
-                        value={formData.name}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    
-                    <label htmlFor="roomNo">ROOM NO.:</label>
-                    <input 
-                        type="text" 
-                        id="roomNo" 
-                        name="roomNo"
-                        value={formData.roomNo}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    
-                    <label htmlFor="sweeping">
-                        <input 
-                            type="checkbox" 
-                            id="sweeping" 
-                            name="sweeping"
-                            checked={formData.sweeping}
-                            onChange={handleInputChange}
-                        />
-                        SWEEPING
-                    </label>
-                    
-                    <label htmlFor="mopping">
-                        <input 
-                            type="checkbox" 
-                            id="mopping" 
-                            name="mopping"
-                            checked={formData.mopping}
-                            onChange={handleInputChange}
-                        />
-                        MOPPING
-                    </label>
-                    
-                    <div className="rating">
-                        <button 
-                            className='ratebtn' 
-                            type="button"
-                            onClick={() => updateRating(-1)}
-                            disabled={formData.rating <= MIN_RATING}
-                        >
-                            -
-                        </button>
-                        <p>YOUR RATING: {formData.rating} / {MAX_RATING}</p>
-                        <button 
-                            className='ratebtn' 
-                            type="button"
-                            onClick={() => updateRating(1)}
-                            disabled={formData.rating >= MAX_RATING}
-                        >
-                            +
-                        </button>
-                    </div>
-                    
-                    <button className='complainbtn' type="submit">Submit Review</button>
-                </form>
-            </div>
-        </div>
-    )
+  return (
+    <div className="cleaning-review widthbox">
+      <h1>Cleaning Review</h1>
+
+      <form onSubmit={handleSubmit}>
+        <label>Name</label>
+        <input
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Room No</label>
+        <input
+          name="roomNo"
+          value={formData.roomNo}
+          onChange={handleChange}
+          required
+        />
+
+        <label>Was the room cleaned?</label>
+        <select
+          name="cleanliness"
+          value={formData.cleanliness}
+          onChange={handleChange}
+          required
+        >
+          <option value="">Select</option>
+          <option value="Good">Good</option>
+          <option value="Bad">Bad</option>
+        </select>
+
+        <label>Improvements Needed</label>
+        <textarea
+          name="improvements"
+          value={formData.improvements}
+          onChange={handleChange}
+          placeholder="Mention areas to improve"
+        />
+
+        <button type="submit">Submit Review</button>
+      </form>
+    </div>
+  )
 }

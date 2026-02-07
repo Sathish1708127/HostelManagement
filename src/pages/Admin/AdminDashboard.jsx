@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import './admindashboard.css'
+import '../../styles/admincss/admindashboard.css'
 
 const DASHBOARD_CARDS = [
     { id: 1, title: 'Students', icon: 'fas fa-graduation-cap', color: 'stud' },
@@ -82,3 +82,35 @@ export default function AdminDashboard() {
         </div>
     )
 }
+
+// import React, { useState } from 'react'
+// import { LaundryAdminTable } from './LaundryAdminTable'
+
+// export function AdminDashboard() {
+//   const [laundryReviews, setLaundryReviews] = useState([
+//     {
+//       id: 1,
+//       name: 'Sathish',
+//       roomNo: 'A-101',
+//       rating: 4,
+//       description: 'Clothes were clean but late',
+//       date: '07/02/2026',
+//       status: 'Not Done'
+//     }
+//   ])
+
+//   const handleStatusChange = (id, newStatus) => {
+//     setLaundryReviews((prev) =>
+//       prev.map((item) =>
+//         item.id === id ? { ...item, status: newStatus } : item
+//       )
+//     )
+//   }
+
+//   return (
+//     <LaundryAdminTable
+//       laundryReviews={laundryReviews}
+//       onStatusChange={handleStatusChange}
+//     />
+//   )
+// }

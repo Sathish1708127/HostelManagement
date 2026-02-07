@@ -1,0 +1,281 @@
+/* Leave Application Form Styles */
+.leave-application {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e8f0fe 100%);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin: 30px auto;
+}
+
+.leave-application h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Form Styles */
+.leave-application form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 40px;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.leave-application label {
+  color: #34495e;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  grid-column: 1 / -1;
+}
+
+.leave-application label + input,
+.leave-application label + textarea {
+  grid-column: 1 / -1;
+  margin-top: -15px;
+}
+
+.leave-application input,
+.leave-application textarea {
+  padding: 12px 15px;
+  border: 2px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  color: #2c3e50;
+}
+
+.leave-application input:focus,
+.leave-application textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  background-color: #f8fbff;
+}
+
+.leave-application input::placeholder,
+.leave-application textarea::placeholder {
+  color: #95a5a6;
+}
+
+.leave-application textarea {
+  resize: vertical;
+  min-height: 100px;
+  grid-column: 1 / -1;
+  line-height: 1.5;
+}
+
+.leave-application button {
+  grid-column: 1 / -1;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+}
+
+.leave-application button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.6);
+  background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+}
+
+.leave-application button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(52, 152, 219, 0.4);
+}
+
+/* Table Styles */
+.leave-application table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.leave-application thead {
+  background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%);
+  color: white;
+}
+
+.leave-application th {
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.leave-application tbody tr {
+  border-bottom: 1px solid #ecf0f1;
+  transition: background-color 0.3s ease;
+}
+
+.leave-application tbody tr:hover {
+  background-color: #f8fbff;
+}
+
+.leave-application tbody tr:last-child {
+  border-bottom: none;
+}
+
+.leave-application td {
+  padding: 14px 16px;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+/* Status Badge Styles */
+.leave-application .status {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.leave-application .status.Pending {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.leave-application .status.Approved {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.leave-application .status.Rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+/* Empty State */
+.leave-application tbody tr:only-child td {
+  text-align: center;
+  color: #95a5a6;
+  padding: 30px 16px;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .leave-application {
+    padding: 25px;
+    margin: 20px auto;
+  }
+
+  .leave-application h1 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  .leave-application form {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .leave-application label + input,
+  .leave-application label + textarea {
+    grid-column: 1;
+  }
+
+  .leave-application button {
+    grid-column: 1;
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .leave-application table {
+    font-size: 12px;
+  }
+
+  .leave-application th,
+  .leave-application td {
+    padding: 10px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .leave-application {
+    padding: 20px;
+  }
+
+  .leave-application h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .leave-application form {
+    grid-template-columns: 1fr;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .leave-application table {
+    font-size: 11px;
+    overflow-x: auto;
+    display: block;
+  }
+
+  .leave-application thead {
+    display: none;
+  }
+
+  .leave-application tbody,
+  .leave-application tr {
+    display: block;
+    width: 100%;
+  }
+
+  .leave-application tr {
+    margin-bottom: 15px;
+    border: 1px solid #bdc3c7;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .leave-application td {
+    display: block;
+    padding: 8px;
+    position: relative;
+    padding-left: 35%;
+  }
+
+  .leave-application td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 8px;
+    font-weight: 600;
+    color: #34495e;
+    text-transform: uppercase;
+    font-size: 10px;
+  }
+}

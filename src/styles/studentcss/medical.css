@@ -1,0 +1,197 @@
+/* Medical Issues Form Styles */
+.medical-issues {
+  background: linear-gradient(135deg, #f5f7fa 0%, #fef3e2 100%);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 650px;
+  margin: 30px auto;
+}
+
+.medical-issues h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.medical-issues form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.medical-issues label {
+  color: #34495e;
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.medical-issues input,
+.medical-issues select,
+.medical-issues textarea {
+  padding: 12px 15px;
+  border: 2px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  color: #2c3e50;
+}
+
+.medical-issues input:focus,
+.medical-issues select:focus,
+.medical-issues textarea:focus {
+  outline: none;
+  border-color: #f39c12;
+  box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.1);
+  background-color: #fffbf7;
+}
+
+.medical-issues input::placeholder,
+.medical-issues textarea::placeholder {
+  color: #95a5a6;
+}
+
+.medical-issues textarea {
+  resize: vertical;
+  min-height: 140px;
+  line-height: 1.6;
+}
+
+.medical-issues select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+/* Conditional medication details styling */
+.medical-issues > input:nth-of-type(2) {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.medical-issues button {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
+}
+
+.medical-issues button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(243, 156, 18, 0.6);
+  background: linear-gradient(135deg, #e67e22 0%, #f39c12 100%);
+}
+
+.medical-issues button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(243, 156, 18, 0.4);
+}
+
+/* Icon for medical info (optional enhancement) */
+.medical-issues form::before {
+  content: '⚕️';
+  display: block;
+  font-size: 32px;
+  text-align: center;
+  margin-bottom: 15px;
+  opacity: 0.8;
+}
+
+/* Info box styling for conditional content */
+.medical-issues > :last-child {
+  background-color: #fff3e0;
+  padding: 15px;
+  border-left: 4px solid #f39c12;
+  border-radius: 4px;
+  margin-top: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .medical-issues {
+    padding: 25px;
+    margin: 20px auto;
+  }
+
+  .medical-issues h1 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  .medical-issues form {
+    padding: 20px;
+  }
+
+  .medical-issues input,
+  .medical-issues select,
+  .medical-issues textarea {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .medical-issues button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .medical-issues {
+    padding: 20px;
+  }
+
+  .medical-issues h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .medical-issues form {
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .medical-issues form::before {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .medical-issues textarea {
+    min-height: 120px;
+  }
+}

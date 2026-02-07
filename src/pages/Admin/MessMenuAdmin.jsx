@@ -1,19 +1,18 @@
 import React, { useState } from 'react'
-import { Foodcards } from './Foodcards'
-import './AdminMess.css'
+import Foodcards from './Foodcards'
+import '../../styles/admincss/AdminMess.css'
 
-export function MessMenuAdmin() {
+export default function MessMenuAdmin() {
   const [menu, setMenu] = useState([])
 
   const addMenuItem = () => {
     const foodname = window.prompt('Enter Food Name')
     if (!foodname) return
-    const image = window.prompt('Enter Image URL (optional)')
     const description = window.prompt('Enter Description (optional)')
 
     setMenu((prev) => [
       ...prev,
-      { id: Date.now(), name: foodname, image: image || '', description: description || '' },
+      { id: Date.now(), name: foodname , description: description || '' },
     ])
   }
 
@@ -27,7 +26,6 @@ export function MessMenuAdmin() {
             <Foodcards
               key={item.id}
               name={item.name}
-              image={item.image}
               description={item.description}
             />
           ))

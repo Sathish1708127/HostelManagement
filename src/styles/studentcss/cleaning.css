@@ -1,0 +1,146 @@
+/* Cleaning Review Form Styles */
+.cleaning-review {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+.cleaning-review h1 {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.cleaning-review form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.cleaning-review label {
+  color: #34495e;
+  font-weight: 500;
+  margin-bottom: 8px;
+  display: block;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.cleaning-review input,
+.cleaning-review select,
+.cleaning-review textarea {
+  padding: 12px 15px;
+  border: 2px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  transition: all 0.3s ease;
+  background-color: #fff;
+  color: #2c3e50;
+}
+
+.cleaning-review input:focus,
+.cleaning-review select:focus,
+.cleaning-review textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+  background-color: #f8fbff;
+}
+
+.cleaning-review input::placeholder,
+.cleaning-review textarea::placeholder {
+  color: #95a5a6;
+}
+
+.cleaning-review textarea {
+  resize: vertical;
+  min-height: 100px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.5;
+}
+
+.cleaning-review button {
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 10px;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.cleaning-review button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.cleaning-review button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.4);
+}
+
+/* Select dropdown styling */
+.cleaning-review select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 20px;
+  padding-right: 40px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cleaning-review {
+    padding: 25px;
+    margin: 20px auto;
+  }
+
+  .cleaning-review h1 {
+    font-size: 24px;
+    margin-bottom: 25px;
+  }
+
+  .cleaning-review input,
+  .cleaning-review select,
+  .cleaning-review textarea {
+    font-size: 16px;
+    padding: 12px;
+  }
+
+  .cleaning-review button {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cleaning-review {
+    padding: 20px;
+  }
+
+  .cleaning-review h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .cleaning-review form {
+    gap: 15px;
+  }
+}

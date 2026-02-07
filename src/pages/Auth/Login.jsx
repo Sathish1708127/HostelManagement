@@ -1,24 +1,43 @@
-import React from 'react'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
-export function Login() {
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const navigate = useNavigate();
+  const { register: registerFn, login: loginFn } = useAuth();
+
+  const register = async () => {
+    try {
+      await registerFn(email, password);
+      alert("Registered");
+      navigate("/");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const login = async () => {
+    try {
+      await loginFn(email, password);
+      alert("Logged in");
+      navigate("/");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div>
-      <h2>Login</h2>
-      <form>
-        <div>
-          <label htmlFor="email">Email:</label>
-          <input type="email" id="email" name="email" required />
-        </div>
-        <div>
-          <label htmlFor="password">Password:</label>
-          <input type="password" id="password" name="password" required />
-        </div>
-        <button type="submit">Login</button>
-        <div>
-            <a href="/forgot-password">Forgot Password?</a>
-            <a href="/register">Register</a>
-        </div>
-      </form>
+      <input placeholder="Email" onChange={e => setEmail(e.target.value)} />
+      <input type="password" placeholder="Password" onChange={e => setPassword(e.target.value)} />
+      <button onClick={register}>Register</button>
+      <button onClick={login}>Login</button>
     </div>
-  )
+  );
 }
+
+export default Login;
+

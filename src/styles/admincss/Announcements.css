@@ -16,6 +16,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
+        width: 76vw;
+    left: 301px;
+    position: sticky;
 }
 
 .ann{

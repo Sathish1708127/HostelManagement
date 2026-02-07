@@ -1,102 +1,80 @@
 import React, { useState } from 'react'
-import './mess.css'
+import '../../styles/studentcss/mess.css'
+import '../../styles/width.css'
 
-const MIN_RATING = 1
-const MAX_RATING = 10
+function MessReviewForm() {
+  const [review, setReview] = useState({
+    studentName: "",
+    rollNo: "",
+    meal: "Lunch",
+    rating: 5,
+    comment: ""
+  });
 
-export default function MessReview() {
-    const [formData, setFormData] = useState({
-        foodQuality: '',
-        service: '',
-        hygiene: '',
-        rating: 5
-    })
+  const handleChange = (e) => {
+    setReview({ ...review, [e.target.name]: e.target.value });
+  };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }))
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    const updateRating = (increment) => {
-        setFormData(prev => ({
-            ...prev,
-            rating: Math.max(MIN_RATING, Math.min(MAX_RATING, prev.rating + increment))
-        }))
-    }
+    // Later replace this with API / Firebase call
+    console.log("Submitted Review:", review);
 
-    const handleSubmit = (e) => {
-        e.preventDefault()
-        if (!formData.foodQuality.trim() || !formData.service.trim() || !formData.hygiene.trim()) {
-            alert('Please fill in all fields')
-            return
-        }
-        console.log('Review submitted:', formData)
-        // Add your API call or data handling here
-    }
+    alert("Review submitted successfully!");
+    setReview({
+      studentName: "",
+      rollNo: "",
+      meal: "Lunch",
+      rating: 5,
+      comment: ""
+    });
+  };
 
-    return (
-        <div>
-            <div className='mess-s'>
-                <div className='header'>
-                <h1>Mess Review</h1>
-                </div>
-                <form onSubmit={handleSubmit}>
-                    <label htmlFor="foodQuality">How Is The Food Quality:</label>
-                    <input 
-                        type="text" 
-                        id="foodQuality" 
-                        name="foodQuality"
-                        value={formData.foodQuality}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    
-                    <label htmlFor="service">Service:</label>
-                    <input 
-                        type="text" 
-                        id="service" 
-                        name="service"
-                        value={formData.service}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    
-                    <label htmlFor="hygiene">Is It Hygiene:</label>
-                    <input 
-                        type="text" 
-                        id="hygiene" 
-                        name="hygiene"
-                        value={formData.hygiene}
-                        onChange={handleInputChange}
-                        required
-                    />
-                    
-                    <div className="rating">
-                        <button 
-                            className='ratebtn' 
-                            type="button"
-                            onClick={() => updateRating(-1)}
-                            disabled={formData.rating <= MIN_RATING}
-                        >
-                            -
-                        </button>
-                        <p>YOUR RATING: {formData.rating} / {MAX_RATING}</p>
-                        <button 
-                            className='ratebtn' 
-                            type="button"
-                            onClick={() => updateRating(1)}
-                            disabled={formData.rating >= MAX_RATING}
-                        >
-                            +
-                        </button>
-                    </div>
-                    
-                    <button className='submit' type="submit">Submit Review</button>
-                </form>
-            </div>
-        </div>
-    )
+  return (
+  <div className='mess-review widthbox'>
+      <h2>Mess Review</h2>
+    <form onSubmit={handleSubmit}>
+        <label htmlFor="studentName">Student Name:</label>
+      <input
+        name="studentName"
+        placeholder="Student Name"
+        value={review.studentName}
+        onChange={handleChange}
+        required
+        />
+        <label htmlFor="rollNo">Roll Number:</label>
+      <input
+        name="rollNo"
+        placeholder="Roll Number"
+        value={review.rollNo}
+        onChange={handleChange}
+        required
+        />
+        <label htmlFor="meal">Meal:</label>
+      <select name="meal" value={review.meal} onChange={handleChange}>
+        <option>Breakfast</option>
+        <option>Lunch</option>
+        <option>Dinner</option>
+      </select>
+        <label htmlFor="rating">Rating:</label>
+      <select name="rating" value={review.rating} onChange={handleChange}>
+        {[1,2,3,4,5].map(r => (
+            <option key={r} value={r}>{r}</option>
+        ))}
+      </select>
+        <label htmlFor="comment">Comment:</label>
+      <textarea
+        name="comment"
+        placeholder="Write your feedback"
+        value={review.comment}
+        onChange={handleChange}
+        />
+
+      <button type="submit">Submit Review</button>
+    </form>
+    </div>
+  );
 }
+
+export default MessReviewForm;
