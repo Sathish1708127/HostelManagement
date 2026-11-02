@@ -29,6 +29,10 @@ export default function CleaningPage() {
   const [form, setForm] = useState({ area: 'Room cleaning', room: '', assignedTo: '' });
   const [message, setMessage] = useState('');
   function assignTask(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (!form.room.trim() || (!isStudent && !form.assignedTo.trim()) || !user) return; setTasks((items) => { const lastId = Math.max(0, ...items.map((item) => Number(item.id.replace('CL-', '')) || 0)); return [{ id: `CL-${String(lastId + 1).padStart(3, '0')}`, ...form, assignedTo: isStudent ? 'Housekeeping queue' : form.assignedTo, student: isStudent ? user.name : undefined, status: 'pending', dueDate: 'Today' }, ...items]; }); setMessage(isStudent ? 'Cleaning request submitted.' : 'Cleaning task assigned.'); setForm({ area: 'Room cleaning', room: '', assignedTo: '' }); setShowForm(false); }
+  function updateTaskStatus(id: string, status: Task['status']) {
+    setTasks((items) => items.map((item) => item.id === id ? { ...item, status } : item));
+    setMessage(`Cleaning task ${id} marked ${status.replace('_', ' ')}.`);
+  }
 
   return (
     <main className="page-content">
@@ -62,7 +66,16 @@ export default function CleaningPage() {
               <span>{t.assignedTo}</span>
               <StatusBadge>{t.status.replace('_', ' ')}</StatusBadge>
               <span>{t.dueDate}</span>
-              {!isStudent && <button className="row-action">Update</button>}
+              {isStudent && t.status === 'completed' ? (
+                <button className="row-action" onClick={() => updateTaskStatus(t.id, 'reopened')}>Request rework</button>
+              ) : !isStudent && ['pending', 'in_progress', 'reopened'].includes(t.status) ? (
+                <button
+                  className="row-action"
+                  onClick={() => updateTaskStatus(t.id, t.status === 'pending' ? 'in_progress' : 'completed')}
+                >
+                  {t.status === 'pending' ? 'Start task' : 'Complete'}
+                </button>
+              ) : <span className="muted">{t.status.replace('_', ' ')}</span>}
             </div>
           ))}
         </div>

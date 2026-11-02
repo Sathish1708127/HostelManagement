@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Modal } from '../../components/ui/CoreComponents';
+import { registerWithEmail } from '../../lib/supabaseClient';
 
 interface RegisterFormData {
   email: string;
@@ -60,16 +60,10 @@ export function RegisterPage() {
 
     setLoading(true);
     try {
-      // TODO: Call registration API
-      console.log('Register:', formData);
+      await registerWithEmail(formData);
       setSuccess(true);
-      
-      // Redirect after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
     } catch (error) {
-      setErrors({ submit: String(error) });
+      setErrors({ submit: error instanceof Error ? error.message : 'Account registration failed.' });
     } finally {
       setLoading(false);
     }
@@ -89,21 +83,13 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <Modal
-        isOpen={success}
-        title="Registration Successful!"
-        onClose={() => navigate('/login')}
-      >
-        <p className="text-gray-700 dark:text-gray-300 mb-4">
-          Your account has been created. Please check your email to verify your address.
-        </p>
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          Redirecting to login...
-        </p>
-      </Modal>
-
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-8">
+    <main className="auth-standalone">
+      {success ? <section className="auth-card auth-standalone-card" role="status">
+        <h1>Registration submitted</h1>
+        <p>Your registration was sent. Check your email to verify the address before signing in.</p>
+        <p>Your hostel may still need to link this account to a resident profile.</p>
+        <button className="primary-button" onClick={() => navigate('/login')}>Return to sign in</button>
+      </section> : <section className="auth-card auth-standalone-card">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             🏠 Hostel Manager
@@ -111,7 +97,7 @@ export function RegisterPage() {
           <p className="text-gray-600 dark:text-gray-400">Create your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="auth-form">
           {/* Full Name */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -235,7 +221,7 @@ export function RegisterPage() {
 
           {/* Form Error */}
           {errors.submit && (
-            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded text-sm text-red-600 dark:text-red-400">
+            <div className="auth-form-error" role="alert">
               {errors.submit}
             </div>
           )}
@@ -244,7 +230,7 @@ export function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
+            className="primary-button auth-submit"
           >
             {loading ? 'Creating account...' : 'Create Account'}
           </button>
@@ -257,7 +243,7 @@ export function RegisterPage() {
             </Link>
           </p>
         </form>
-      </div>
-    </div>
+      </section>}
+    </main>
   );
 }

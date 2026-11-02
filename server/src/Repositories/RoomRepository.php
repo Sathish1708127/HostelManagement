@@ -5,10 +5,18 @@ use App\Config\Database;
 
 final class RoomRepository
 {
-    public static function floorMap(?string $buildingCode, ?int $floorNumber): array
+    public static function floorMap(
+        ?string $buildingCode,
+        ?int $floorNumber,
+        ?int $residentUserId = null
+    ): array
     {
         $where = ['rooms.deleted_at IS NULL'];
         $parameters = [];
+        if ($residentUserId !== null) {
+            $where[] = 'student_profiles.user_id = :resident_user_id';
+            $parameters['resident_user_id'] = $residentUserId;
+        }
         if ($buildingCode !== null && $buildingCode !== '') {
             $where[] = 'buildings.code = :building';
             $parameters['building'] = $buildingCode;

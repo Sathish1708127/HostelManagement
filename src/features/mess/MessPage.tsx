@@ -22,7 +22,7 @@ export default function MessPage() {
   const isStudent = user?.role === 'student';
   const canEditMenu = user?.role === 'mess_manager' || user?.role === 'super_admin';
   const [selectedDay, setSelectedDay] = useState('Monday');
-  const [optedIn, setOptedIn] = usePersistentState('mess-opted-in', true);
+  const [optedIn, setOptedIn] = usePersistentState(`mess-opted-in:${user?.id ?? 'guest'}`, true);
   const [selectedMeal, setSelectedMeal] = useState<string | null>(null);
   const [rating, setRating] = useState('5');
   const [review, setReview] = useState('');

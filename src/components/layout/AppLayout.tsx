@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/providers';
 
+const demoMode = import.meta.env.VITE_SUPABASE_MOCK === 'true';
+
 type NavigationLink = {
   to: string;
   label: string;
@@ -22,6 +24,10 @@ const studentGroups: { label: string; links: NavigationLink[] }[] = [
   { label: 'Dining & campus', links: [{ to: '/mess', label: 'Mess and meals', short: 'MM' }, { to: '/visitors', label: 'Visitor requests', short: 'VR' }, { to: '/bookings', label: 'Facility bookings', short: 'FB' }, { to: '/parcels', label: 'Parcels', short: 'PC' }] },
   { label: 'Community', links: [{ to: '/announcements', label: 'Announcements', short: 'AN' }, { to: '/gallery', label: 'Gallery', short: 'GA' }, { to: '/lostfound', label: 'Lost and found', short: 'LF' }, { to: '/community', label: 'Community board', short: 'CM' }] },
   { label: 'My account', links: [{ to: '/fees', label: 'Fees and receipts', short: 'FE' }] },
+];
+
+const guardianGroups: { label: string; links: NavigationLink[] }[] = [
+  { label: 'Hostel updates', links: [{ to: '/dashboard', label: 'Overview', short: 'OV' }, { to: '/announcements', label: 'Announcements', short: 'AN' }, { to: '/calendar', label: 'Calendar', short: 'CA' }, { to: '/gallery', label: 'Gallery', short: 'GA' }, { to: '/mess', label: 'Mess menu', short: 'MM' }] },
 ];
 
 function pageTitle(pathname: string) {
@@ -54,7 +60,11 @@ export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
-  const groups = user?.role === 'student' ? studentGroups : staffGroups;
+  const groups = user?.role === 'student'
+    ? studentGroups
+    : user?.role === 'parent_guardian'
+      ? guardianGroups
+      : staffGroups;
 
   async function handleSignOut() {
     await signOut();
@@ -72,7 +82,7 @@ export default function AppLayout() {
         <div className="brand brand-light"><span>HP</span>Hostel Pulse</div>
         <div className="hostel-switcher">
           <span>HN</span>
-          <div><strong>Haven North</strong><small>Operations workspace</small></div>
+          <div><strong>Haven North</strong><small>{user?.role === 'parent_guardian' ? 'Guardian workspace' : user?.role === 'student' ? 'Student workspace' : 'Operations workspace'}</small></div>
         </div>
         <nav className="sidebar-nav" aria-label="Main navigation">
           {groups.map((group) => (
@@ -95,7 +105,10 @@ export default function AppLayout() {
         </nav>
         <div className="sidebar-status">
           <span className="status-dot" />
-          <div><strong>All systems normal</strong><small>Last checked just now</small></div>
+          <div>
+            <strong>{demoMode ? 'Local demo' : 'Live mode'}</strong>
+            <small>{demoMode ? 'Data stays in this browser' : 'Some modules still use sample data'}</small>
+          </div>
         </div>
       </aside>
 

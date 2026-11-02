@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Toast } from '../../components/ui/CoreComponents';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
+import { exchangePasswordResetCode, requestPasswordReset, updatePassword, verifyPasswordResetCode } from '../../lib/supabaseClient';
 
 interface PasswordResetFormData {
   step: 'email' | 'code' | 'password';
@@ -12,6 +12,8 @@ interface PasswordResetFormData {
 
 export function PasswordResetPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const handledCode = useRef<string | null>(null);
   const [formData, setFormData] = useState<PasswordResetFormData>({
     step: 'email',
     email: '',
@@ -22,6 +24,25 @@ export function PasswordResetPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  useEffect(() => {
+    const code = searchParams.get('code');
+    if (!code || handledCode.current === code) return;
+    handledCode.current = code;
+    setLoading(true);
+    void exchangePasswordResetCode(code)
+      .then(() => {
+        setFormData((previous) => ({ ...previous, step: 'password' }));
+        setToast({ message: 'Reset link verified. Choose a new password.', type: 'success' });
+      })
+      .catch((error: unknown) => {
+        setToast({
+          message: error instanceof Error ? error.message : 'The password reset link could not be verified.',
+          type: 'error',
+        });
+      })
+      .finally(() => setLoading(false));
+  }, [searchParams]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +59,11 @@ export function PasswordResetPage() {
 
     setLoading(true);
     try {
-      // TODO: Call password reset API to send verification code
-      console.log('Send reset code to:', formData.email);
+      await requestPasswordReset(formData.email);
       setFormData((prev) => ({ ...prev, step: 'code' }));
-      setToast({ message: 'Verification code sent to your email', type: 'success' });
+      setToast({ message: 'If the account exists, a password reset email has been sent.', type: 'success' });
     } catch (error) {
-      setErrors({ email: String(error) });
+      setErrors({ email: error instanceof Error ? error.message : 'Unable to send a password reset email.' });
     } finally {
       setLoading(false);
     }
@@ -53,8 +73,8 @@ export function PasswordResetPage() {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    if (!formData.code.trim()) {
-      newErrors.code = 'Verification code is required';
+    if (!/^\d{6}$/.test(formData.code.trim())) {
+      newErrors.code = 'Enter the 6-digit code from your email.';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -64,12 +84,11 @@ export function PasswordResetPage() {
 
     setLoading(true);
     try {
-      // TODO: Call API to verify code
-      console.log('Verify code:', formData.code);
+      await verifyPasswordResetCode(formData.email, formData.code.trim());
       setFormData((prev) => ({ ...prev, step: 'password' }));
       setToast({ message: 'Code verified successfully', type: 'success' });
     } catch (error) {
-      setErrors({ code: String(error) });
+      setErrors({ code: error instanceof Error ? error.message : 'The verification code could not be verified.' });
     } finally {
       setLoading(false);
     }
@@ -93,12 +112,11 @@ export function PasswordResetPage() {
 
     setLoading(true);
     try {
-      // TODO: Call API to reset password
-      console.log('Reset password for:', formData.email);
+      await updatePassword(formData.newPassword);
       setToast({ message: 'Password reset successfully', type: 'success' });
       setTimeout(() => navigate('/login'), 2000);
     } catch (error) {
-      setErrors({ newPassword: String(error) });
+      setErrors({ newPassword: error instanceof Error ? error.message : 'Password could not be reset.' });
     } finally {
       setLoading(false);
     }
@@ -117,18 +135,15 @@ export function PasswordResetPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
+    <main className="auth-standalone">
       {toast && (
-        <div className="fixed top-4 right-4 z-50">
-          <Toast
-            message={toast.message}
-            type={toast.type}
-            onClose={() => setToast(null)}
-          />
+        <div className={`auth-toast ${toast.type}`} role="status">
+          <span>{toast.message}</span>
+          <button type="button" aria-label="Dismiss message" onClick={() => setToast(null)}>×</button>
         </div>
       )}
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-8">
+      <section className="auth-card auth-standalone-card">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
             🔐 Reset Password
@@ -141,34 +156,17 @@ export function PasswordResetPage() {
         </div>
 
         {/* Step Indicator */}
-        <div className="flex justify-between mb-8">
+        <div className="auth-step-indicator">
           {(['email', 'code', 'password'] as const).map((step, idx) => (
-            <div key={step} className="flex items-center">
-              <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                  ['email', 'code', 'password'].indexOf(formData.step) >= idx
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
-                }`}
-              >
-                {idx + 1}
-              </div>
-              {idx < 2 && (
-                <div
-                  className={`flex-1 h-1 mx-2 ${
-                    ['email', 'code', 'password'].indexOf(formData.step) > idx
-                      ? 'bg-blue-600'
-                      : 'bg-gray-200 dark:bg-gray-700'
-                  }`}
-                />
-              )}
-            </div>
+            <span key={step} className={['email', 'code', 'password'].indexOf(formData.step) >= idx ? 'active' : ''}>
+              {idx + 1}
+            </span>
           ))}
         </div>
 
         {/* Email Step */}
         {formData.step === 'email' && (
-          <form onSubmit={handleEmailSubmit} className="space-y-4">
+          <form onSubmit={handleEmailSubmit} className="auth-form">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Email Address *
@@ -191,7 +189,7 @@ export function PasswordResetPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
+              className="primary-button auth-submit"
             >
               {loading ? 'Sending...' : 'Send Verification Code'}
             </button>
@@ -200,7 +198,7 @@ export function PasswordResetPage() {
 
         {/* Code Step */}
         {formData.step === 'code' && (
-          <form onSubmit={handleCodeSubmit} className="space-y-4">
+          <form onSubmit={handleCodeSubmit} className="auth-form">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Verification Code *
@@ -212,6 +210,7 @@ export function PasswordResetPage() {
                 onChange={handleChange}
                 placeholder="000000"
                 maxLength={6}
+                inputMode="numeric"
                 className={`w-full px-4 py-2 border rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-center text-2xl tracking-widest ${
                   errors.code ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'
                 }`}
@@ -227,7 +226,7 @@ export function PasswordResetPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
+              className="primary-button auth-submit"
             >
               {loading ? 'Verifying...' : 'Verify Code'}
             </button>
@@ -235,7 +234,7 @@ export function PasswordResetPage() {
             <button
               type="button"
               onClick={() => setFormData((prev) => ({ ...prev, step: 'email' }))}
-              className="w-full py-2 px-4 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg font-medium transition hover:bg-gray-300 dark:hover:bg-gray-600"
+              className="quiet-button auth-secondary"
             >
               Back
             </button>
@@ -244,7 +243,7 @@ export function PasswordResetPage() {
 
         {/* Password Step */}
         {formData.step === 'password' && (
-          <form onSubmit={handlePasswordSubmit} className="space-y-4">
+          <form onSubmit={handlePasswordSubmit} className="auth-form">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 New Password (min. 8 chars) *
@@ -286,7 +285,7 @@ export function PasswordResetPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
+              className="primary-button auth-submit"
             >
               {loading ? 'Resetting...' : 'Reset Password'}
             </button>
@@ -299,7 +298,7 @@ export function PasswordResetPage() {
             ← Back to Login
           </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

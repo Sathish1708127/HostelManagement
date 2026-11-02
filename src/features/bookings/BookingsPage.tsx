@@ -57,6 +57,10 @@ export default function BookingsPage() {
     setMessage('Booking request submitted for approval.');
     setShowBookingForm(false);
   }
+  function updateBookingStatus(id: string, status: Booking['status']) {
+    setBookings((items) => items.map((item) => item.id === id ? { ...item, status } : item));
+    setMessage(`Booking ${id} ${status.replace('_', ' ')}.`);
+  }
 
   return (
     <main className="page-content">
@@ -93,7 +97,13 @@ export default function BookingsPage() {
               <strong>{b.id}</strong><span>{b.facility}</span>{!isStudent && <span>{b.student}</span>}
               <span>{b.date}</span><span>{b.timeSlot}</span>
               <StatusBadge>{b.status.replace('_', ' ')}</StatusBadge>
-              <span className="muted">{isStudent ? 'Request status' : 'Manage'}</span>
+              {isStudent && ['pending', 'confirmed'].includes(b.status) ? (
+                <button className="row-action" onClick={() => updateBookingStatus(b.id, 'cancelled')}>Cancel</button>
+              ) : !isStudent && b.status === 'pending' ? (
+                <button className="row-action" onClick={() => updateBookingStatus(b.id, 'confirmed')}>Approve</button>
+              ) : !isStudent && b.status === 'confirmed' ? (
+                <button className="row-action" onClick={() => updateBookingStatus(b.id, 'completed')}>Complete</button>
+              ) : <span className="muted">{b.status.replace('_', ' ')}</span>}
             </div>
           ))}
         </div>

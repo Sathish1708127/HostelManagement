@@ -98,8 +98,48 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   background: white;
 }
 .auth-card .primary-button { width: 100%; margin-top: 8px; }
+.auth-links { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0 16px; font-size: 0.82rem; }
+.auth-links a { color: #4b5caa; text-decoration: none; }
+.auth-links a:hover { text-decoration: underline; }
 .form-error { padding: 11px 13px; border-radius: 8px; color: #9f2636; background: #fff0f1; font-size: 0.86rem; }
-.demo-login { display: flex; align-items: center; gap: 8px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
+.auth-standalone { position: relative; display: grid; min-height: 100vh; padding: 24px; place-items: center; background: radial-gradient(circle at 15% 15%, #e8edff, #f8f9fd 52%, #e4f6f1); }
+.auth-standalone-card { width: min(100%, 480px); padding: 34px; }
+.auth-standalone-card h1 { margin: 0 0 10px; font-size: 1.8rem; letter-spacing: -0.035em; }
+.auth-standalone-card h2 { margin: 0; font-size: 1.25rem; }
+.auth-standalone-card p { color: var(--muted); line-height: 1.55; }
+.auth-standalone-card .text-center { text-align: center; margin-bottom: 24px; }
+.auth-form { display: grid; gap: 16px; }
+.auth-form label { display: grid; gap: 7px; margin: 0; font-size: 0.86rem; font-weight: 700; }
+.auth-form input, .auth-form select, .auth-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #d8ddea;
+  border-radius: 10px;
+  padding: 12px 13px;
+  color: var(--ink);
+  background: white;
+  font: inherit;
+}
+.auth-form input:focus, .auth-form select:focus, .auth-form textarea:focus { outline: 2px solid #7787d8; outline-offset: 1px; }
+.auth-form input.invalid { border-color: #c83d4d; }
+.auth-form .text-red-600 { margin: 0; color: #a52c3b; font-size: 0.82rem; }
+.auth-form-error { padding: 11px 13px; border: 1px solid #f1c8cc; border-radius: 8px; color: #9f2636; background: #fff0f1; font-size: 0.86rem; }
+.auth-standalone-card .auth-submit, .auth-standalone-card .auth-secondary { width: 100%; margin-top: 4px; }
+.auth-standalone-card > p + .primary-button { margin-top: 12px; }
+.auth-standalone-card a { color: #4b5caa; text-decoration: none; }
+.auth-standalone-card a:hover { text-decoration: underline; }
+.auth-step-indicator { display: flex; justify-content: space-between; max-width: 280px; margin: 0 auto 26px; }
+.auth-step-indicator span { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 50%; color: #64708a; background: #e8ebf2; font-weight: 750; }
+.auth-step-indicator span.active { color: white; background: #4b5caa; }
+.auth-toast { position: fixed; z-index: 50; top: 20px; right: 20px; display: flex; max-width: min(90vw, 440px); align-items: center; gap: 16px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: var(--shadow); }
+.auth-toast.error { color: #9f2636; background: #fff0f1; }
+.auth-toast button { border: 0; color: inherit; background: transparent; font-size: 1.2rem; }
+.auth-verification { text-align: center; }
+.auth-verification h1 { margin-top: 10px; }
+.auth-modal-backdrop { position: fixed; z-index: 50; inset: 0; display: grid; padding: 20px; place-items: center; background: #10162999; }
+.auth-modal-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.auth-modal-heading .quiet-button { min-width: 40px; }
+.demo-login { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line); }
 .demo-login span { margin-right: auto; color: var(--muted); font-size: 0.8rem; }
 .demo-login button { border: 1px solid var(--line); border-radius: 7px; padding: 6px 9px; color: #495168; background: white; font-size: 0.76rem; }
 
@@ -335,6 +375,7 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
   .hostel-illustration { min-height: 190px; }
   .auth-panel { padding: 20px; }
   .auth-card { padding: 28px 22px; }
+  .auth-standalone-card { padding: 26px 22px; }
   .auth-story { min-height: 38vh; padding: 28px 22px; }
   .auth-story h1 { margin-top: 42px; font-size: 2.2rem; }
   .auth-story > div > p:last-child { font-size: 0.92rem; }

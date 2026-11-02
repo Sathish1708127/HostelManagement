@@ -11,7 +11,7 @@ type Visitor = {
   student: string;
   purpose: string;
   checkIn: string;
-  status: 'checked_in' | 'checked_out' | 'pending';
+  status: 'pending' | 'approved' | 'checked_in' | 'checked_out';
 };
 
 const mockVisitors: Visitor[] = [
@@ -38,6 +38,22 @@ export default function VisitorsPage() {
     setMessage('Visitor pre-registered. The guard can check them in when they arrive.');
     setForm({ name: '', contact: '', student: '', purpose: '' });
     setShowForm(false);
+  }
+  function advanceVisitor(id: string) {
+    const nextStatus: Record<Visitor['status'], Visitor['status']> = {
+      pending: 'approved',
+      approved: 'checked_in',
+      checked_in: 'checked_out',
+      checked_out: 'checked_out',
+    };
+    const visitor = visitors.find((item) => item.id === id);
+    if (!visitor || visitor.status === 'checked_out') return;
+    setVisitors((items) => items.map((item) => item.id === id ? {
+      ...item,
+      status: nextStatus[item.status],
+      checkIn: item.status === 'approved' ? new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : item.checkIn,
+    } : item));
+    setMessage(`Visitor ${id} marked ${nextStatus[visitor.status].replace('_', ' ')}.`);
   }
 
   return (
@@ -73,7 +89,13 @@ export default function VisitorsPage() {
               <div className="resident-cell"><p><strong>{v.name}</strong><small>{v.id}</small></p></div>
               <span>{v.contact}</span><span>{v.student}</span><span>{v.purpose}</span><span>{v.checkIn}</span>
               <StatusBadge>{v.status.replace('_', ' ')}</StatusBadge>
-              {!isStudent && <button className="row-action" onClick={() => setVisitors((items) => items.map((item) => item.id === v.id && item.status === 'pending' ? { ...item, status: 'checked_in', checkIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) } : item))}>{v.status === 'pending' ? 'Check in' : 'View'}</button>}
+              {!isStudent && <button
+                className="row-action"
+                disabled={v.status === 'checked_out'}
+                onClick={() => advanceVisitor(v.id)}
+              >
+                {v.status === 'pending' ? 'Approve' : v.status === 'approved' ? 'Check in' : v.status === 'checked_in' ? 'Check out' : 'Checked out'}
+              </button>}
             </div>
           ))}
         </div>

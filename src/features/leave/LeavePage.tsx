@@ -44,6 +44,10 @@ export default function LeavePage() {
     setForm({ student: user?.name ?? '', type: 'Weekend', destination: '', from: '', to: '' });
     setShowForm(false);
   }
+  function updateLeaveStatus(id: string, status: LeaveRequest['status']) {
+    setLeaves((items) => items.map((item) => item.id === id ? { ...item, status } : item));
+    setMessage(`Leave request ${id} ${status}.`);
+  }
 
   return (
     <main className="page-content">
@@ -77,7 +81,14 @@ export default function LeavePage() {
               <strong>{l.id}</strong><span>{l.student}</span><span>{l.type}</span>
               <span>{l.destination}</span><span>{l.from} – {l.to}</span>
               <StatusBadge>{l.status}</StatusBadge>
-              <button className="row-action">View</button>
+              {isStudent && l.status === 'pending' ? (
+                <button className="row-action" onClick={() => updateLeaveStatus(l.id, 'cancelled')}>Cancel</button>
+              ) : !isStudent && l.status === 'pending' ? (
+                <span className="heading-actions">
+                  <button className="row-action" onClick={() => updateLeaveStatus(l.id, 'approved')}>Approve</button>
+                  <button className="row-action" onClick={() => updateLeaveStatus(l.id, 'rejected')}>Reject</button>
+                </span>
+              ) : <span className="muted">{l.status === 'approved' ? 'Gate pass ready' : l.status}</span>}
             </div>
           ))}
         </div>

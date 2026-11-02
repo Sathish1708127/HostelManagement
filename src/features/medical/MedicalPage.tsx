@@ -29,6 +29,10 @@ export default function MedicalPage() {
   const [message, setMessage] = useState('');
   const visibleReports = reports.filter((report) => !isStudent || report.student === user?.name);
   function reportIssue(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (!form.description.trim() || (!isStudent && !form.student.trim()) || !user) return; setReports((items) => { const lastId = Math.max(0, ...items.map((item) => Number(item.id.replace('MD-', '')) || 0)); return [{ id: `MD-${String(lastId + 1).padStart(3, '0')}`, ...form, student: isStudent ? user.name : form.student, status: 'submitted', createdAt: 'Today' }, ...items]; }); setMessage(form.urgency === 'emergency' ? 'Emergency health issue logged. Contact emergency services if immediate help is needed.' : 'Health issue reported to the medical centre.'); setForm({ student: user?.name ?? '', type: 'Wellness', description: '', urgency: 'medium' }); setShowForm(false); }
+  function updateReportStatus(id: string, status: MedicalReport['status']) {
+    setReports((items) => items.map((item) => item.id === id ? { ...item, status } : item));
+    setMessage(`Health report ${id} marked ${status.replace('_', ' ')}.`);
+  }
 
   return (
     <main className="page-content">
@@ -67,7 +71,16 @@ export default function MedicalPage() {
                 <span className={`priority ${r.urgency}`}>{r.urgency}</span>
                 <span>{r.status.replace('_', ' ')}</span>
                 <span>{r.createdAt}</span>
-                <span className="muted">{isStudent ? 'Confidential' : 'View'}</span>
+                {isStudent && r.status === 'resolved' ? (
+                  <button className="row-action" onClick={() => updateReportStatus(r.id, 'follow_up')}>Request follow-up</button>
+                ) : !isStudent && r.status !== 'resolved' ? (
+                  <button
+                    className="row-action"
+                    onClick={() => updateReportStatus(r.id, r.status === 'submitted' ? 'in_review' : r.status === 'in_review' ? 'actioned' : r.status === 'follow_up' ? 'actioned' : 'resolved')}
+                  >
+                    {r.status === 'submitted' ? 'Review' : r.status === 'in_review' ? 'Record action' : r.status === 'follow_up' ? 'Continue follow-up' : 'Resolve'}
+                  </button>
+                ) : <span className="muted">{r.status === 'follow_up' ? 'Follow-up requested' : isStudent ? 'Confidential' : 'Resolved'}</span>}
               </div>
             ))}
           </div>

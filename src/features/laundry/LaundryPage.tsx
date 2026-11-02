@@ -28,6 +28,10 @@ export default function LaundryPage() {
   const [form, setForm] = useState({ student: user?.name ?? '', itemCount: '1' });
   const [message, setMessage] = useState('');
   function createBatch(event: FormEvent<HTMLFormElement>) { event.preventDefault(); const itemCount = Number(form.itemCount); if ((!isStudent && !form.student.trim()) || !Number.isInteger(itemCount) || itemCount < 1 || !user) return; setBatches((items) => { const lastId = Math.max(0, ...items.map((item) => Number(item.id.replace('LA-', '')) || 0)); return [{ id: `LA-${String(lastId + 1).padStart(3, '0')}`, tagNumber: `T-${2040 + lastId + 1}`, student: isStudent ? user.name : form.student, itemCount, status: 'submitted', submittedAt: 'Today' }, ...items]; }); setMessage(isStudent ? 'Laundry pickup request created.' : 'Laundry batch created and ready for collection.'); setForm({ student: user?.name ?? '', itemCount: '1' }); setShowForm(false); }
+  function advanceBatch(id: string, nextStatus: LaundryBatch['status']) {
+    setBatches((items) => items.map((item) => item.id === id ? { ...item, status: nextStatus } : item));
+    setMessage(`Laundry batch ${id} marked ${nextStatus.replace('_', ' ')}.`);
+  }
 
   return (
     <main className="page-content">
@@ -60,7 +64,16 @@ export default function LaundryPage() {
               <strong>{b.id}</strong><span>{b.tagNumber}</span>
               <span>{b.student}</span><span>{b.itemCount}</span>
               <StatusBadge>{b.status}</StatusBadge><span>{b.submittedAt}</span>
-              <span className="muted">{isStudent ? 'Track status above' : 'Manage in service desk'}</span>
+              {isStudent && b.status === 'ready' ? (
+                <button className="row-action" onClick={() => advanceBatch(b.id, 'returned')}>Confirm pickup</button>
+              ) : !isStudent && ['submitted', 'collected', 'washing', 'ready'].includes(b.status) ? (
+                <button
+                  className="row-action"
+                  onClick={() => advanceBatch(b.id, ({ submitted: 'collected', collected: 'washing', washing: 'ready', ready: 'returned' } as const)[b.status as 'submitted' | 'collected' | 'washing' | 'ready'])}
+                >
+                  {b.status === 'submitted' ? 'Collect' : b.status === 'collected' ? 'Start wash' : b.status === 'washing' ? 'Mark ready' : 'Return'}
+                </button>
+              ) : <span className="muted">{b.status === 'returned' ? 'Completed' : 'No action'}</span>}
             </div>
           ))}
         </div>

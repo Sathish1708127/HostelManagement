@@ -44,7 +44,7 @@ if ($method === 'POST' && $path === '/api/v1/residents') {
 }
 
 if ($method === 'GET' && $path === '/api/v1/rooms') {
-    $result = RoomController::index();
+    $result = RoomController::index($user);
     $status = 200;
     return;
 }

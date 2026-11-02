@@ -51,6 +51,22 @@ export default function ComplaintsPage() {
     setForm({ title: '', category: 'Maintenance', location: '', priority: 'medium' });
     setShowForm(false);
   }
+  function advanceComplaint(id: string) {
+    const nextStatus: Record<Complaint['status'], Complaint['status']> = {
+      submitted: 'acknowledged',
+      acknowledged: 'assigned',
+      assigned: 'in_progress',
+      in_progress: 'resolved',
+      resolved: 'closed',
+      closed: 'closed',
+    };
+    const complaint = complaints.find((item) => item.id === id);
+    if (!complaint || complaint.status === 'closed') return;
+    setComplaints((items) => items.map((item) =>
+      item.id === id ? { ...item, status: nextStatus[item.status] } : item,
+    ));
+    setMessage(`Request ${id} moved to ${nextStatus[complaint.status].replace('_', ' ')}.`);
+  }
 
   return (
     <main className="page-content">
@@ -102,7 +118,13 @@ export default function ComplaintsPage() {
               <span className={`priority ${c.priority}`}>{c.priority}</span>
               <StatusBadge>{c.status.replace('_', ' ')}</StatusBadge>
               <span>{c.sla}</span>
-              <button className="row-action">Open</button>
+              {!isStudent && <button
+                className="row-action"
+                disabled={c.status === 'closed'}
+                onClick={() => advanceComplaint(c.id)}
+              >
+                {c.status === 'submitted' ? 'Acknowledge' : c.status === 'acknowledged' ? 'Assign' : c.status === 'assigned' ? 'Start work' : c.status === 'in_progress' ? 'Resolve' : c.status === 'resolved' ? 'Close' : 'Closed'}
+              </button>}
             </div>
           ))}
         </div>

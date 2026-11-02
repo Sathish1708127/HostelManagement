@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './providers';
 
 type LocationState = { from?: string };
@@ -34,8 +34,8 @@ export default function Login() {
     }
   }
 
-  function fillDemoCredentials(role: 'warden' | 'student') {
-    setEmail(role === 'student' ? 'student@haven.test' : 'warden@haven.test');
+  function fillDemoCredentials(role: 'warden' | 'student' | 'guardian') {
+    setEmail(role === 'student' ? 'student@haven.test' : role === 'guardian' ? 'guardian@haven.test' : 'warden@haven.test');
     setPassword('demo-password');
   }
 
@@ -64,6 +64,10 @@ export default function Login() {
           <label>Password
             <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" minLength={6} required />
           </label>
+          <div className="auth-links">
+            <Link to="/reset-password">Forgot password?</Link>
+            <Link to="/register">Create a student account</Link>
+          </div>
           {error && <div className="form-error" role="alert">{error}</div>}
           <button className="primary-button" type="submit" disabled={loading}>
             {loading ? 'Signing in...' : 'Sign in'}
@@ -72,6 +76,7 @@ export default function Login() {
             <span>Local demo</span>
             <button type="button" onClick={() => fillDemoCredentials('warden')}>Warden</button>
             <button type="button" onClick={() => fillDemoCredentials('student')}>Student</button>
+            <button type="button" onClick={() => fillDemoCredentials('guardian')}>Guardian</button>
           </div>
         </form>
       </section>

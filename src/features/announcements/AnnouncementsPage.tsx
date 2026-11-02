@@ -25,15 +25,18 @@ const mockAnnouncements: Announcement[] = [
 export default function AnnouncementsPage() {
   const { user } = useAuth();
   const isStudent = user?.role === 'student';
+  const isResident = isStudent || user?.role === 'parent_guardian';
   const canPublish = user?.role !== 'student' && user?.role !== 'parent_guardian';
   const [announcements, setAnnouncements] = usePersistentState('announcements', mockAnnouncements);
-  const [readAnnouncementIds, setReadAnnouncementIds] = usePersistentState<string[]>('read-announcements', []);
+  const [readAnnouncementIds, setReadAnnouncementIds] = usePersistentState<string[]>(`read-announcements:${user?.id ?? 'guest'}`, []);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ title: '', body: '', audience: 'All residents', urgency: 'low' as Announcement['urgency'] });
   const [message, setMessage] = useState('');
   function publishAnnouncement(event: FormEvent<HTMLFormElement>) { event.preventDefault(); if (!form.title.trim() || !form.body.trim()) return; setAnnouncements((items) => { const lastId = Math.max(0, ...items.map((item) => Number(item.id.replace('AN-', '')) || 0)); return [{ id: `AN-${String(lastId + 1).padStart(3, '0')}`, ...form, author: user?.name ?? 'Hostel staff', createdAt: 'Today', readCount: 0, totalCount: 486 }, ...items]; }); setMessage('Announcement published.'); setForm({ title: '', body: '', audience: 'All residents', urgency: 'low' }); setShowCreate(false); }
-  const visibleAnnouncements = announcements.filter((announcement) => !isStudent || announcement.audience === 'All residents');
+  const visibleAnnouncements = announcements.filter((announcement) =>
+    !isResident || announcement.audience === 'All residents',
+  );
   function markRead(announcement: Announcement) {
     setReadAnnouncementIds((ids) => ids.includes(announcement.id) ? ids : [...ids, announcement.id]);
     setMessage('Announcement marked as read.');
@@ -53,15 +56,15 @@ export default function AnnouncementsPage() {
       </section>
       {message && <p className="muted" role="status">{message}</p>}
       <section className="metric-grid compact">
-        <article className="mini-metric"><span>{isStudent ? 'Unread' : 'Active'}</span><strong>{isStudent ? visibleAnnouncements.filter((item) => !readAnnouncementIds.includes(item.id)).length : visibleAnnouncements.length}</strong><small>{isStudent ? 'Hostel notices' : 'This week'}</small></article>
-        {!isStudent && <><article className="mini-metric"><span>Avg read rate</span><strong>72%</strong><small>Across all</small></article>
+        <article className="mini-metric"><span>{isResident ? 'Unread' : 'Active'}</span><strong>{isResident ? visibleAnnouncements.filter((item) => !readAnnouncementIds.includes(item.id)).length : visibleAnnouncements.length}</strong><small>{isResident ? 'Hostel notices' : 'This week'}</small></article>
+        {!isResident && <><article className="mini-metric"><span>Avg read rate</span><strong>72%</strong><small>Across all</small></article>
         <article className="mini-metric"><span>Urgent</span><strong>{visibleAnnouncements.filter((item) => item.urgency === 'high').length}</strong><small>Needs attention</small></article></>}
       </section>
       <section className="panel">
         <div className="panel-heading"><h2>All announcements</h2></div>
         <div className="data-table" role="table">
           <div className="data-row data-header" role="row">
-            <span>Title</span><span>Audience</span><span>Urgency</span><span>Author</span>{!isStudent && <span>Read</span>}<span>Date</span><span />
+            <span>Title</span><span>Audience</span><span>Urgency</span><span>Author</span>{!isResident && <span>Read</span>}<span>Date</span><span />
           </div>
           {visibleAnnouncements.map((a) => (
             <div className="data-row" role="row" key={a.id}>
@@ -69,9 +72,9 @@ export default function AnnouncementsPage() {
               <span>{a.audience}</span>
               <StatusBadge>{a.urgency}</StatusBadge>
               <span>{a.author}</span>
-              {!isStudent && <span>{a.readCount}/{a.totalCount}</span>}
+              {!isResident && <span>{a.readCount}/{a.totalCount}</span>}
               <span>{a.createdAt}</span>
-              <button className="row-action" onClick={() => setSelectedAnnouncement(a)}>{isStudent && readAnnouncementIds.includes(a.id) ? 'Read' : 'View'}</button>
+              <button className="row-action" onClick={() => setSelectedAnnouncement(a)}>{isResident && readAnnouncementIds.includes(a.id) ? 'Read' : 'View'}</button>
             </div>
           ))}
         </div>
@@ -79,7 +82,7 @@ export default function AnnouncementsPage() {
       {selectedAnnouncement && <section className="panel" style={{ marginTop: 16 }}>
         <div className="panel-heading"><h2>{selectedAnnouncement.title}</h2><button className="quiet-button" onClick={() => setSelectedAnnouncement(null)}>Close</button></div>
         <p>{selectedAnnouncement.body}</p>
-        {isStudent && <button className="primary-button" disabled={readAnnouncementIds.includes(selectedAnnouncement.id)} onClick={() => markRead(selectedAnnouncement)}>{readAnnouncementIds.includes(selectedAnnouncement.id) ? 'Already read' : 'Mark as read'}</button>}
+        {isResident && <button className="primary-button" disabled={readAnnouncementIds.includes(selectedAnnouncement.id)} onClick={() => markRead(selectedAnnouncement)}>{readAnnouncementIds.includes(selectedAnnouncement.id) ? 'Already read' : 'Mark as read'}</button>}
       </section>}
       {canPublish && showCreate && (
         <form className="panel" onSubmit={publishAnnouncement} style={{ marginTop: 16 }}>

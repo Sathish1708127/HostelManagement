@@ -8,6 +8,9 @@ const Gallery = lazy(() => import('../features/gallery/GalleryPage'));
 const Residents = lazy(() => import('../features/residents/ResidentsPage'));
 const Rooms = lazy(() => import('../features/rooms/RoomsPage'));
 const Login = lazy(() => import('./Login'));
+const Register = lazy(() => import('../features/auth/RegisterPage').then((module) => ({ default: module.RegisterPage })));
+const PasswordReset = lazy(() => import('../features/auth/PasswordResetPage').then((module) => ({ default: module.PasswordResetPage })));
+const EmailVerification = lazy(() => import('../features/auth/EmailVerificationPage').then((module) => ({ default: module.EmailVerificationPage })));
 const ProtectedRoute = lazy(() => import('./ProtectedRoute'));
 const Attendance = lazy(() => import('../features/attendance/AttendancePage'));
 const Visitors = lazy(() => import('../features/visitors/VisitorsPage'));
@@ -27,7 +30,8 @@ const Community = lazy(() => import('../features/community/CommunityPage'));
 const Checkout = lazy(() => import('../features/checkout/CheckoutReadinessPage'));
 const Reports = lazy(() => import('../features/reports/ReportsPage'));
 const staffRoles = ['super_admin', 'warden', 'accountant', 'mess_manager', 'maintenance_staff', 'cleaning_staff', 'security_guard'] as const;
-const hostelRoles = [...staffRoles, 'student', 'parent_guardian'] as const;
+const residentRoles = [...staffRoles, 'student'] as const;
+const hostelRoles = [...residentRoles, 'parent_guardian'] as const;
 
 function LoadingScreen() {
   return <div className="page-loader" role="status">Loading Hostel Pulse...</div>;
@@ -38,6 +42,9 @@ export function AppRouter() {
     <Suspense fallback={<LoadingScreen />}>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/reset-password" element={<PasswordReset />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
         <Route
           element={
             <ProtectedRoute roles={[...hostelRoles]}>
@@ -49,22 +56,22 @@ export function AppRouter() {
           <Route path="/calendar" element={<ProtectedRoute roles={[...hostelRoles]}><Calendar /></ProtectedRoute>} />
           <Route path="/gallery" element={<ProtectedRoute roles={[...hostelRoles]}><Gallery /></ProtectedRoute>} />
           <Route path="/residents" element={<ProtectedRoute roles={[...staffRoles]}><Residents /></ProtectedRoute>} />
-          <Route path="/rooms" element={<ProtectedRoute roles={[...hostelRoles]}><Rooms /></ProtectedRoute>} />
-          <Route path="/attendance" element={<ProtectedRoute roles={[...hostelRoles]}><Attendance /></ProtectedRoute>} />
+          <Route path="/rooms" element={<ProtectedRoute roles={[...residentRoles]}><Rooms /></ProtectedRoute>} />
+          <Route path="/attendance" element={<ProtectedRoute roles={[...residentRoles]}><Attendance /></ProtectedRoute>} />
           <Route path="/visitors" element={<ProtectedRoute roles={['super_admin', 'warden', 'security_guard', 'student']}><Visitors /></ProtectedRoute>} />
-          <Route path="/laundry" element={<ProtectedRoute roles={[...hostelRoles]}><Laundry /></ProtectedRoute>} />
+          <Route path="/laundry" element={<ProtectedRoute roles={[...residentRoles]}><Laundry /></ProtectedRoute>} />
           <Route path="/mess" element={<ProtectedRoute roles={[...hostelRoles]}><Mess /></ProtectedRoute>} />
-          <Route path="/cleaning" element={<ProtectedRoute roles={[...hostelRoles]}><Cleaning /></ProtectedRoute>} />
-          <Route path="/complaints" element={<ProtectedRoute roles={[...hostelRoles]}><Complaints /></ProtectedRoute>} />
-          <Route path="/leave" element={<ProtectedRoute roles={[...hostelRoles]}><Leave /></ProtectedRoute>} />
-          <Route path="/medical" element={<ProtectedRoute roles={[...staffRoles, 'student']}><Medical /></ProtectedRoute>} />
-          <Route path="/announcements" element={<ProtectedRoute roles={[...staffRoles, 'student']}><Announcements /></ProtectedRoute>} />
+          <Route path="/cleaning" element={<ProtectedRoute roles={[...residentRoles]}><Cleaning /></ProtectedRoute>} />
+          <Route path="/complaints" element={<ProtectedRoute roles={[...residentRoles]}><Complaints /></ProtectedRoute>} />
+          <Route path="/leave" element={<ProtectedRoute roles={[...residentRoles]}><Leave /></ProtectedRoute>} />
+          <Route path="/medical" element={<ProtectedRoute roles={['super_admin', 'warden', 'student']}><Medical /></ProtectedRoute>} />
+          <Route path="/announcements" element={<ProtectedRoute roles={[...hostelRoles]}><Announcements /></ProtectedRoute>} />
           <Route path="/fees" element={<ProtectedRoute roles={['super_admin', 'warden', 'accountant', 'student']}><Fees /></ProtectedRoute>} />
           <Route path="/assets" element={<ProtectedRoute roles={[...staffRoles]}><Assets /></ProtectedRoute>} />
-          <Route path="/parcels" element={<ProtectedRoute roles={[...staffRoles, 'student']}><Parcels /></ProtectedRoute>} />
-          <Route path="/bookings" element={<ProtectedRoute roles={[...staffRoles, 'student']}><Bookings /></ProtectedRoute>} />
-          <Route path="/lostfound" element={<ProtectedRoute roles={[...staffRoles, 'student']}><LostFound /></ProtectedRoute>} />
-          <Route path="/community" element={<ProtectedRoute roles={[...staffRoles, 'student']}><Community /></ProtectedRoute>} />
+          <Route path="/parcels" element={<ProtectedRoute roles={[...residentRoles]}><Parcels /></ProtectedRoute>} />
+          <Route path="/bookings" element={<ProtectedRoute roles={[...residentRoles]}><Bookings /></ProtectedRoute>} />
+          <Route path="/lostfound" element={<ProtectedRoute roles={[...residentRoles]}><LostFound /></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute roles={[...residentRoles]}><Community /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute roles={['super_admin', 'warden']}><Checkout /></ProtectedRoute>} />
           <Route path="/reports" element={<ProtectedRoute roles={['super_admin', 'warden', 'accountant']}><Reports /></ProtectedRoute>} />
         </Route>

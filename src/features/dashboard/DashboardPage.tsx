@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isStudent = user?.role === 'student';
+  const isGuardian = user?.role === 'parent_guardian';
   const metrics = staffMetrics;
   const today = new Date();
   const greeting = today.getHours() < 12 ? 'Good morning' : today.getHours() < 18 ? 'Good afternoon' : 'Good evening';
@@ -28,20 +29,36 @@ export default function DashboardPage() {
     <main className="page-content">
       <section className="page-heading">
         <div>
-          <p className="eyebrow">{isStudent ? 'Resident overview' : today.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+          <p className="eyebrow">{isStudent ? 'Resident overview' : isGuardian ? 'Guardian overview' : today.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
           <h1>{greeting}, {user?.name.split(' ')[0]}.</h1>
-          <p>{isStudent ? 'Here is what matters for your hostel day.' : 'Here is the state of Haven North right now.'}</p>
+          <p>{isStudent ? 'Here is what matters for your hostel day.' : isGuardian ? 'Stay informed about general hostel updates.' : 'Here is the state of Haven North right now.'}</p>
         </div>
-        <button className="primary-button" onClick={() => navigate(isStudent ? '/complaints' : '/residents')}>
+        {!isGuardian && <button className="primary-button" onClick={() => navigate(isStudent ? '/complaints' : '/residents')}>
           {isStudent ? 'New request' : 'Add resident'}
-        </button>
+        </button>}
       </section>
 
-      {!isStudent && <section className="metric-grid" aria-label="Hostel summary">
+      {!isStudent && !isGuardian && <section className="metric-grid" aria-label="Hostel summary">
         {metrics.map((metric) => <MetricCard key={metric.label} {...metric} />)}
       </section>}
 
-      {isStudent ? <section className="dashboard-grid" aria-label="Student services">
+      {isGuardian ? <section className="dashboard-grid" aria-label="Guardian overview">
+        <article className="panel wide-panel">
+          <p className="eyebrow">Account linking</p>
+          <h2>Student profile access is not connected</h2>
+          <p className="muted">This guardian account can view general hostel updates, but no student profile has been linked. Contact the hostel office to link a student before viewing personal records.</p>
+        </article>
+        {[
+          ['/announcements', 'Announcements', 'Read hostel notices and updates.'],
+          ['/calendar', 'Calendar', 'Check hostel events and holidays.'],
+          ['/mess', 'Mess menu', 'View the weekly dining menu.'],
+          ['/gallery', 'Gallery', 'Browse photos saved in this browser.'],
+        ].map(([path, title, description]) => <article className="panel" key={path}>
+          <div className="panel-heading"><h2>{title}</h2></div>
+          <p className="muted">{description}</p>
+          <button className="quiet-button" onClick={() => navigate(path)}>Open {title.toLowerCase()}</button>
+        </article>)}
+      </section> : isStudent ? <section className="dashboard-grid" aria-label="Student services">
         <article className="panel student-hostel-card">
           <div className="student-hostel-copy">
             <p className="eyebrow">Your place, connected</p>
@@ -140,7 +157,7 @@ export default function DashboardPage() {
                 <p><strong>{title}</strong><small>{place}</small></p>
                 <StatusBadge>{status}</StatusBadge>
                 <span className={`priority ${priority.toLowerCase()}`}>{priority}</span>
-                <button aria-label={`Open ${id}`}>Open</button>
+                <button aria-label={`Open ${id}`} onClick={() => navigate('/complaints')}>Open</button>
               </div>
             ))}
           </div>

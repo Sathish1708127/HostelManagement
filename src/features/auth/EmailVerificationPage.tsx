@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
-import { Modal } from '../../components/ui/CoreComponents';
+import { resendVerificationEmail, verifyEmailLink } from '../../lib/supabaseClient';
 
 export function EmailVerificationPage() {
   const [searchParams] = useSearchParams();
@@ -10,29 +10,34 @@ export function EmailVerificationPage() {
   const [resendLoading, setResendLoading] = useState(false);
   const [resendEmail, setResendEmail] = useState('');
   const [showResendForm, setShowResendForm] = useState(false);
+  const [resendMessage, setResendMessage] = useState('');
 
   useEffect(() => {
-    const verifyEmail = async () => {
-      const token = searchParams.get('token');
-      if (!token) {
-        setStatus('error');
-        setMessage('Verification token not found');
-        return;
-      }
+    let active = true;
+    let redirectTimer: number | undefined;
 
+    async function verifyEmail() {
       try {
-        // TODO: Call email verification API with token
-        console.log('Verifying email with token:', token);
+        const code = searchParams.get('code');
+        const tokenHash = searchParams.get('token_hash') ?? searchParams.get('token');
+        if (!code && !tokenHash) throw new Error('Verification link is missing its token.');
+        await verifyEmailLink({ code, tokenHash, type: searchParams.get('type') });
+        if (!active) return;
         setStatus('success');
         setMessage('Email verified successfully! Redirecting to login...');
-        setTimeout(() => navigate('/login'), 3000);
+        redirectTimer = window.setTimeout(() => navigate('/login'), 3000);
       } catch (error) {
+        if (!active) return;
         setStatus('error');
-        setMessage('Email verification failed. Please try again.');
+        setMessage(error instanceof Error ? error.message : 'Email verification failed. Please try again.');
       }
-    };
+    }
 
-    verifyEmail();
+    void verifyEmail();
+    return () => {
+      active = false;
+      if (redirectTimer !== undefined) window.clearTimeout(redirectTimer);
+    };
   }, [searchParams, navigate]);
 
   const handleResendEmail = async (e: React.FormEvent) => {
@@ -40,20 +45,19 @@ export function EmailVerificationPage() {
     setResendLoading(true);
 
     try {
-      // TODO: Call resend verification email API
-      console.log('Resend verification to:', resendEmail);
+      await resendVerificationEmail(resendEmail);
       setShowResendForm(false);
-      setMessage('Verification email sent! Check your inbox.');
+      setResendMessage('If the address is registered, a verification email has been sent.');
     } catch (error) {
-      setMessage('Failed to send email. Please try again.');
+      setResendMessage(error instanceof Error ? error.message : 'Failed to send the verification email.');
     } finally {
       setResendLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-8 text-center">
+    <main className="auth-standalone">
+      <section className="auth-card auth-standalone-card auth-verification">
         {status === 'verifying' && (
           <>
             <div className="text-5xl mb-4 animate-spin">⏳</div>
@@ -90,50 +94,43 @@ export function EmailVerificationPage() {
             <p className="text-gray-600 dark:text-gray-400 mb-6">{message}</p>
             <button
               onClick={() => setShowResendForm(true)}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
+              className="primary-button auth-submit"
             >
               Resend Verification Email
             </button>
           </>
         )}
+        {resendMessage && <p className="text-sm text-gray-600 dark:text-gray-400 mt-4" role="status">{resendMessage}</p>}
 
         <div className="mt-6">
           <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:underline">
             Back to Login
           </Link>
         </div>
-      </div>
-
-      {/* Resend Email Modal */}
-      <Modal
-        isOpen={showResendForm}
-        title="Resend Verification Email"
-        onClose={() => setShowResendForm(false)}
-      >
-        <form onSubmit={handleResendEmail} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={resendEmail}
-              onChange={(e) => setResendEmail(e.target.value)}
-              placeholder="your@email.com"
-              required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
+      </section>
+      {showResendForm && <div className="auth-modal-backdrop">
+        <section className="auth-card auth-standalone-card" role="dialog" aria-modal="true" aria-labelledby="resend-title">
+          <div className="auth-modal-heading">
+            <h2 id="resend-title">Resend verification email</h2>
+            <button type="button" className="quiet-button" aria-label="Close" onClick={() => setShowResendForm(false)}>×</button>
           </div>
-
-          <button
-            type="submit"
-            disabled={resendLoading}
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg font-medium transition"
-          >
-            {resendLoading ? 'Sending...' : 'Resend Email'}
-          </button>
-        </form>
-      </Modal>
-    </div>
+          <form onSubmit={handleResendEmail} className="auth-form">
+            <label>
+              Email address
+              <input
+                type="email"
+                value={resendEmail}
+                onChange={(e) => setResendEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+              />
+            </label>
+            <button type="submit" disabled={resendLoading} className="primary-button auth-submit">
+              {resendLoading ? 'Sending...' : 'Resend email'}
+            </button>
+          </form>
+        </section>
+      </div>}
+    </main>
   );
 }
