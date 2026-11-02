@@ -1,0 +1,26 @@
+.students{
+    position: relative;
+    left: 307px;
+}
+
+.students form{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    width: 68vw;
+}
+.students input{
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.students table{
+    width: 93%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+.students th, .students td{
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
