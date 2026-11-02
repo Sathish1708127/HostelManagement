@@ -1,0 +1,79 @@
+-- Migration: Guardian profiles, student guardians, documents, emergency contacts
+-- Run on MySQL 8+
+
+CREATE TABLE IF NOT EXISTS guardian_profiles (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  user_id BIGINT UNSIGNED NOT NULL UNIQUE,
+  relation VARCHAR(50) NOT NULL DEFAULT 'parent',
+  address TEXT DEFAULT NULL,
+  city VARCHAR(100) DEFAULT NULL,
+  state VARCHAR(100) DEFAULT NULL,
+  postal_code VARCHAR(20) DEFAULT NULL,
+  country VARCHAR(100) DEFAULT NULL,
+  occupation VARCHAR(100) DEFAULT NULL,
+  organization VARCHAR(255) DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_relation (relation)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS student_guardians (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  student_id BIGINT UNSIGNED NOT NULL,
+  guardian_id BIGINT UNSIGNED NOT NULL,
+  is_primary BOOLEAN NOT NULL DEFAULT FALSE,
+  consent_given BOOLEAN NOT NULL DEFAULT FALSE,
+  consent_date DATETIME DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY unique_guardian_pair (student_id, guardian_id),
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (guardian_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_primary (is_primary),
+  INDEX idx_consent (consent_given)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS documents (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  user_id BIGINT UNSIGNED NOT NULL,
+  document_type VARCHAR(100) NOT NULL,
+  display_name VARCHAR(255) NOT NULL,
+  file_path VARCHAR(500) NOT NULL,
+  file_size INT NOT NULL,
+  mime_type VARCHAR(100) DEFAULT NULL,
+  uploaded_by BIGINT UNSIGNED DEFAULT NULL,
+  verified BOOLEAN NOT NULL DEFAULT FALSE,
+  verified_by BIGINT UNSIGNED DEFAULT NULL,
+  verified_at DATETIME DEFAULT NULL,
+  expiry_date DATE DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (verified_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_user_type (user_id, document_type),
+  INDEX idx_verified (verified),
+  INDEX idx_expiry (expiry_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS emergency_contacts (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  student_id BIGINT UNSIGNED NOT NULL,
+  contact_name VARCHAR(255) NOT NULL,
+  relation VARCHAR(50) NOT NULL,
+  phone VARCHAR(32) NOT NULL,
+  email VARCHAR(255) DEFAULT NULL,
+  address TEXT DEFAULT NULL,
+  priority TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  is_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_student_priority (student_id, priority),
+  INDEX idx_verified (is_verified)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_documents_file_path ON documents(file_path(100));
+CREATE INDEX idx_emergency_phone ON emergency_contacts(phone);

@@ -1,0 +1,26 @@
+﻿
+> hostel-pulse@0.1.0 build
+> tsc && vite build
+
+src/features/announcements/AnnouncementsPage.tsx(28,6): error TS17008: JSX element 'main' has no corresponding closing tag.
+src/features/announcements/AnnouncementsPage.tsx(81,8): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/announcements/AnnouncementsPage.tsx(82,7): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/features/announcements/AnnouncementsPage.tsx(83,4): error TS1005: '}' expected.
+src/features/announcements/AnnouncementsPage.tsx(84,1): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/announcements/AnnouncementsPage.tsx(85,1): error TS1005: '</' expected.
+src/features/bookings/BookingsPage.tsx(28,6): error TS17008: JSX element 'main' has no corresponding closing tag.
+src/features/bookings/BookingsPage.tsx(87,8): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/bookings/BookingsPage.tsx(88,7): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/features/bookings/BookingsPage.tsx(89,4): error TS1005: '}' expected.
+src/features/bookings/BookingsPage.tsx(90,1): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/bookings/BookingsPage.tsx(91,1): error TS1005: '</' expected.
+src/features/community/CommunityPage.tsx(41,10): error TS17008: JSX element 'article' has no corresponding closing tag.
+src/features/community/CommunityPage.tsx(62,13): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/community/CommunityPage.tsx(64,11): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/features/community/CommunityPage.tsx(65,7): error TS1005: ')' expected.
+src/features/reports/ReportsPage.tsx(20,6): error TS17008: JSX element 'main' has no corresponding closing tag.
+src/features/reports/ReportsPage.tsx(68,8): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/reports/ReportsPage.tsx(69,7): error TS17002: Expected corresponding JSX closing tag for 'div'.
+src/features/reports/ReportsPage.tsx(70,4): error TS1005: '}' expected.
+src/features/reports/ReportsPage.tsx(71,1): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+src/features/reports/ReportsPage.tsx(72,1): error TS1005: '</' expected.

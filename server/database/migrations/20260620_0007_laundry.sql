@@ -1,0 +1,96 @@
+-- Migration: Laundry management
+-- Run on MySQL 8+
+
+CREATE TABLE IF NOT EXISTS laundry_batches (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  batch_code VARCHAR(50) NOT NULL UNIQUE,
+  hostel_id BIGINT UNSIGNED NOT NULL,
+  batch_date DATE NOT NULL,
+  collection_date DATE DEFAULT NULL,
+  delivery_date DATE DEFAULT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'created',
+  total_items INT NOT NULL DEFAULT 0,
+  created_by BIGINT UNSIGNED DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (hostel_id) REFERENCES hostels(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_status (status),
+  INDEX idx_batch_date (batch_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS laundry_items (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  batch_id BIGINT UNSIGNED NOT NULL,
+  student_id BIGINT UNSIGNED NOT NULL,
+  item_description VARCHAR(255) NOT NULL,
+  quantity INT NOT NULL DEFAULT 1,
+  item_status VARCHAR(50) NOT NULL DEFAULT 'submitted',
+  special_instructions TEXT DEFAULT NULL,
+  damage_reported BOOLEAN NOT NULL DEFAULT FALSE,
+  damage_description TEXT DEFAULT NULL,
+  damage_reported_by BIGINT UNSIGNED DEFAULT NULL,
+  damage_reported_at DATETIME DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (batch_id) REFERENCES laundry_batches(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (damage_reported_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_batch (batch_id),
+  INDEX idx_student (student_id),
+  INDEX idx_status (item_status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS laundry_events (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  batch_id BIGINT UNSIGNED NOT NULL,
+  event_type VARCHAR(50) NOT NULL,
+  event_date DATETIME NOT NULL,
+  performed_by BIGINT UNSIGNED DEFAULT NULL,
+  notes TEXT DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (batch_id) REFERENCES laundry_batches(id) ON DELETE CASCADE,
+  FOREIGN KEY (performed_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_batch (batch_id),
+  INDEX idx_event_type (event_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS laundry_disputes (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  item_id BIGINT UNSIGNED NOT NULL,
+  student_id BIGINT UNSIGNED NOT NULL,
+  dispute_type VARCHAR(50) NOT NULL,
+  description TEXT NOT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'open',
+  resolution TEXT DEFAULT NULL,
+  resolved_by BIGINT UNSIGNED DEFAULT NULL,
+  resolved_at DATETIME DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (item_id) REFERENCES laundry_items(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (resolved_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_status (status),
+  INDEX idx_student (student_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS service_reviews (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  batch_id BIGINT UNSIGNED NOT NULL,
+  student_id BIGINT UNSIGNED NOT NULL,
+  rating TINYINT UNSIGNED NOT NULL,
+  comments TEXT DEFAULT NULL,
+  review_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (batch_id) REFERENCES laundry_batches(id) ON DELETE CASCADE,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_review (batch_id, student_id),
+  INDEX idx_rating (rating)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_laundry_items_batch_student ON laundry_items(batch_id, student_id);

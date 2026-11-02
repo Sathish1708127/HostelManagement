@@ -1,0 +1,125 @@
+-- Migration: Fees and accounting
+-- Run on MySQL 8+
+
+CREATE TABLE IF NOT EXISTS fee_structures (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  hostel_id BIGINT UNSIGNED NOT NULL,
+  academic_year VARCHAR(20) NOT NULL,
+  fee_type VARCHAR(100) NOT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  currency VARCHAR(3) NOT NULL DEFAULT 'INR',
+  due_date DATE DEFAULT NULL,
+  late_fee_applicable BOOLEAN NOT NULL DEFAULT FALSE,
+  late_fee_amount DECIMAL(12, 2) DEFAULT NULL,
+  late_fee_type VARCHAR(50) DEFAULT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (hostel_id) REFERENCES hostels(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_fee (hostel_id, academic_year, fee_type),
+  INDEX idx_active (is_active)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS invoices (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  invoice_number VARCHAR(50) NOT NULL UNIQUE,
+  student_id BIGINT UNSIGNED NOT NULL,
+  hostel_id BIGINT UNSIGNED NOT NULL,
+  academic_year VARCHAR(20) NOT NULL,
+  invoice_date DATE NOT NULL,
+  due_date DATE NOT NULL,
+  total_amount DECIMAL(12, 2) NOT NULL,
+  discount_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  tax_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  net_amount DECIMAL(12, 2) NOT NULL,
+  currency VARCHAR(3) NOT NULL DEFAULT 'INR',
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  issued_by BIGINT UNSIGNED DEFAULT NULL,
+  notes TEXT DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (hostel_id) REFERENCES hostels(id) ON DELETE CASCADE,
+  FOREIGN KEY (issued_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_student (student_id),
+  INDEX idx_status (status),
+  INDEX idx_due_date (due_date)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS invoice_items (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  invoice_id BIGINT UNSIGNED NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  quantity INT DEFAULT 1,
+  unit_price DECIMAL(12, 2) NOT NULL,
+  tax_applicable BOOLEAN NOT NULL DEFAULT FALSE,
+  tax_percentage DECIMAL(5, 2) DEFAULT NULL,
+  line_total DECIMAL(12, 2) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
+  INDEX idx_invoice (invoice_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS payments (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  transaction_id VARCHAR(100) UNIQUE DEFAULT NULL,
+  student_id BIGINT UNSIGNED NOT NULL,
+  invoice_id BIGINT UNSIGNED DEFAULT NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  currency VARCHAR(3) NOT NULL DEFAULT 'INR',
+  payment_method VARCHAR(50) NOT NULL,
+  payment_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  reference_number VARCHAR(100) DEFAULT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'completed',
+  receipt_number VARCHAR(50) UNIQUE DEFAULT NULL,
+  notes TEXT DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE SET NULL,
+  INDEX idx_student (student_id),
+  INDEX idx_payment_date (payment_date),
+  INDEX idx_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS payment_allocations (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  payment_id BIGINT UNSIGNED NOT NULL,
+  invoice_id BIGINT UNSIGNED NOT NULL,
+  allocated_amount DECIMAL(12, 2) NOT NULL,
+  allocation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE CASCADE,
+  FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
+  INDEX idx_payment (payment_id),
+  INDEX idx_invoice (invoice_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS refunds (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  uuid CHAR(36) NOT NULL UNIQUE,
+  refund_number VARCHAR(50) NOT NULL UNIQUE,
+  payment_id BIGINT UNSIGNED NOT NULL,
+  refund_amount DECIMAL(12, 2) NOT NULL,
+  refund_reason TEXT NOT NULL,
+  requested_by BIGINT UNSIGNED NOT NULL,
+  approved_by BIGINT UNSIGNED DEFAULT NULL,
+  approval_date DATETIME DEFAULT NULL,
+  status VARCHAR(50) NOT NULL DEFAULT 'pending',
+  refund_date DATETIME DEFAULT NULL,
+  notes TEXT DEFAULT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (payment_id) REFERENCES payments(id) ON DELETE CASCADE,
+  FOREIGN KEY (requested_by) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (approved_by) REFERENCES users(id) ON DELETE SET NULL,
+  INDEX idx_status (status),
+  INDEX idx_payment (payment_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_invoices_student_date ON invoices(student_id, invoice_date);
+CREATE INDEX idx_payments_transaction ON payments(transaction_id);
